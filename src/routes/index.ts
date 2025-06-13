@@ -1,9 +1,10 @@
 import { Router } from 'express';
+import { login,  register } from '../controllers/authController';
+import { verifyApikey } from '../middlewares/verifyApikey';
 
 const router = Router();
 
-router.get('/', (_req, res) => {
-  res.send('Hello from router');
-});
+router.post('/auth/login', verifyApikey, login);
+router.post('/auth/register', verifyApikey, register);
 
 export default router;
