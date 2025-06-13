@@ -1,13 +1,16 @@
 import crypto from 'crypto';
+import dotenv from 'dotenv';
 
-const SECRET_KEY = 'A9CCF340D9A49MBL';
-const IV = 'JFKlnUZyyu0MzMbl';
+dotenv.config();
+
+const SECRET_KEY = process.env.SECRET_KEY;
+const IV = process.env.IV;
 
 export const encrypt = (text: string): string => {
   const cipher = crypto.createCipheriv(
     'aes-128-cbc',
-    Buffer.from(SECRET_KEY, 'utf8'),
-    Buffer.from(IV, 'utf8')
+    Buffer.from(SECRET_KEY!, 'utf8'),
+    Buffer.from(IV!, 'utf8')
   );
   cipher.setAutoPadding(true);
   let encrypted = cipher.update(text, 'utf8', 'hex');
@@ -18,8 +21,8 @@ export const encrypt = (text: string): string => {
 export const decrypt = (encrypted: string): string => {
   const decipher = crypto.createDecipheriv(
     'aes-128-cbc',
-    Buffer.from(SECRET_KEY, 'utf8'),
-    Buffer.from(IV, 'utf8')
+    Buffer.from(SECRET_KEY!, 'utf8'),
+    Buffer.from(IV!, 'utf8')
   );
   decipher.setAutoPadding(true);
   let decrypted = decipher.update(encrypted, 'hex', 'utf8');

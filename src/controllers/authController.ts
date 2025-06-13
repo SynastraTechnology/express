@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcrypt';
 
 export const login = async (req: Request, res: Response): Promise<void> => {
-  const uniqueid = req.body.uniqueid || 'JFKlnUZyyu0MzMbl';
+  const uniqueid = req.body.uniqueid || process.env.IV;
   const timestamp = new Date().toISOString().replace(/[-T:.Z]/g, '').slice(0, 14);
 
   try {
@@ -52,7 +52,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const register = async (req: Request, res: Response): Promise<void> => {
-  const uniqueid = req.body.uniqueid || 'JFKlnUZyyu0MzMbl';
+  const uniqueid = req.body.uniqueid || process.env.IV;
   const timestamp = new Date().toISOString().replace(/[-T:.Z]/g, '').slice(0, 14);
 
   try {
@@ -106,6 +106,41 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
     res.status(500).json({
       uniqueid,
+      timestamp,
+      code: '500',
+      message: encryptedError
+    });
+  }
+};
+
+export const logout = async (req: Request, res: Response): Promise<void> => {
+  const iv = req.body.uniqueid || process.env.IV;
+  const timestamp = new Date().toISOString().replace(/[-T:.Z]/g, '').slice(0, 14);
+
+  try {
+    const { message } = req.body;
+    const decrypted = decrypt(message);
+    const payload = JSON.parse(decrypted);
+
+    console.log('Logout:', payload.email);
+
+    const responsePayload = JSON.stringify({
+      message: 'Logout successful'
+    });
+
+    const encryptedMessage = encrypt(responsePayload);
+
+    res.json({
+      uniqueid: iv,
+      timestamp,
+      code: '200',
+      message: encryptedMessage
+    });
+  } catch (err) {
+    const encryptedError = encrypt('Logout failed');
+
+    res.status(500).json({
+      uniqueid: iv,
       timestamp,
       code: '500',
       message: encryptedError
